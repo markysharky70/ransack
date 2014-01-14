@@ -76,7 +76,11 @@ module Ransack
       method_name = method_id.to_s
       writer = method_name.sub!(/\=$/, '')
       if base.attribute_method?(method_name)
-        base.send(method_id, *args)
+        begin
+          base.send(method_id, *args)
+        rescue NoMethodError => ex
+          Rails.logger.debug("ransack method_missing: #{method_name} #{ex.class.to_s} #{ex.message}")
+        end
       else
         super
       end
